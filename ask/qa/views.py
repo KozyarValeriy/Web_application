@@ -1,6 +1,10 @@
-#Контроллер для приложения qa
+# Контроллер для приложения qa
 
 from django.http import HttpResponse
 
+
 def test(request, *args, **kwargs):
-	return HttpResponse('OK')
+	print(args)
+	print(kwargs)
+	response = HttpResponse(content="OK")
+	return response
