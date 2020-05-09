@@ -3,13 +3,15 @@ from django.conf.urls import url
 
 from . import views
 
+app_name = 'qa'
+
 urlpatterns = [
-    url(r'^$', views.test, name='home'),
+    url(r'^$', views.get_page, name='home'),
     url(r'^login/$', views.test, name='login'),
     url(r'^signup/$', views.test, name='signup'),
-    url(r'^question/(\d+)/$', views.test, name='question'),
+    url(r'^question/(?P<question_id>\d+)/$', views.get_question, name='question'),
     url(r'^ask/$', views.test, name='ask'),
-    url(r'^popular/$', views.test, name='popular'),
+    url(r'^popular/$', views.get_popular, name='popular'),
     url(r'^new/$', views.test, name='new'),
 ]
 
