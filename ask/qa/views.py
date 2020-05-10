@@ -60,7 +60,7 @@ def get_question(request: HttpRequest, question_id: int):
 		form = AnswerForm(request.POST)
 		if form.is_valid():
 			form.save(question)
-		return HttpResponseRedirect(reverse('qa:question', args=(question_id, )))
+		# return HttpResponseRedirect(reverse('qa:question', args=(question_id, )))
 	else:
 		form = AnswerForm(initial={'question': question_id})
 	# получаем все ответы на данный вопрос
