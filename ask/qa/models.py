@@ -37,11 +37,14 @@ class Question(models.Model):
         return self.title
 
     def get_url(self):
-        return reverse('qa:question', args=(self.id, ))
+        """ Метод для получения ссылки на данный вопрос """
+        if hasattr(self, "id"):
+            return reverse('qa:question', args=(self.id, ))
 
 
 # Answer - ответ
 class Answer(models.Model):
+    objects = models.Manager()
     # text - текст ответа
     text = models.TextField()
     # added_at - дата добавления ответа
