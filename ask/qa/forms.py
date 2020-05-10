@@ -23,7 +23,8 @@ class AskForm(forms.Form):
         super(AskForm, self).clean()
 
     def save(self) -> Question:
-        question = Question(**self.cleaned_data, author=self._user)
+        data = {"text": self.cleaned_data["text"], "title": self.cleaned_data["title"], "author": self._user}
+        question = Question(**data)
         question.save()
         return question
 
