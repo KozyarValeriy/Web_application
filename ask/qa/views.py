@@ -4,10 +4,11 @@ from django.http import HttpRequest, HttpResponse, Http404, HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Model
+from django.contrib import auth
 from django.urls import reverse
 
 from .models import Question, Answer
-from .forms import AskForm, AnswerForm
+from .forms import AskForm, AnswerForm, SignUpForm
 
 
 def test(request: HttpRequest, *args, **kwargs):
@@ -17,15 +18,57 @@ def test(request: HttpRequest, *args, **kwargs):
 	return response
 
 
+def login(request: HttpRequest):
+	user = request.user
+	print(user, user.is_authenticated())
+	print(request.COOKIES)
+	if request.method == "POST":
+		form = SignUpForm(request.POST)
+		try:
+			if form.is_valid():
+				username = request.POST['username']
+				password = request.POST['password']
+				user = SignUpForm.get_user(username=username, password=password)
+				if user is not None:
+					auth.logout(request)
+					auth.login(request, user)
+				return HttpResponseRedirect(reverse('qa:home'))
+		except Exception:
+			form = SignUpForm()
+	else:
+		form = SignUpForm()
+	content = {"form": form, "path": "login"}
+	return render(request, "qa/login_form.html", content)
+
+
+def signup(request: HttpRequest):
+	""" Функция для обработки url: /signup/ """
+	user = request.user
+	print(user, user.is_authenticated())
+	print(request.COOKIES)
+	if request.method == "POST":
+		form = SignUpForm(request.POST)
+		try:
+			if form.is_valid():
+				user = form.save()
+				auth.login(request, user)
+				return HttpResponseRedirect(reverse('qa:home'))
+		except Exception:
+			form = SignUpForm()
+	else:
+		form = SignUpForm()
+	content = {"form": form, "path": "signup"}
+	return render(request, "qa/login_form.html", content)
+
+
 def get_ask(request: HttpRequest):
-	""" Функция для обработки url: /?page=... """
+	""" Функция для обработки url: /ask/?page=... """
 	if request.method == "POST":
 		form = AskForm(request.POST)
 		if form.is_valid():
-			print("after")
+			form.user = request.user
 			question = form.save()
 			return HttpResponseRedirect(question.get_url())
-
 	else:
 		form = AskForm()
 	content = {"form": form}
@@ -34,6 +77,11 @@ def get_ask(request: HttpRequest):
 
 def get_page(request: HttpRequest):
 	""" Функция для обработки url: /?page=... """
+
+	user = request.user
+	print(user, user.is_authenticated())
+	print(request.COOKIES)
+
 	# получаем вопросы, отсортированнаые по убыванию по id
 	question = Question.objects.new()
 	# получаем список вопросов на текущую страницу
@@ -59,6 +107,7 @@ def get_question(request: HttpRequest, question_id: int):
 	if request.method == "POST":
 		form = AnswerForm(request.POST)
 		if form.is_valid():
+			form.user = request.user
 			form.save(question)
 		# return HttpResponseRedirect(reverse('qa:question', args=(question_id, )))
 	else:

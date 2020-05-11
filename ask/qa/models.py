@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+import datetime
+
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
 
@@ -56,3 +59,12 @@ class Answer(models.Model):
 
     def __str__(self):
         return self.text
+
+
+# class Session(models.Model):
+#     key = models.CharField(unique=True)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     expires = models.DateTimeField(default=timezone.now() + datetime.timedelta(days=5))
+#
+#     def __str__(self):
+#         return f"{self.user} - {self.key}"
